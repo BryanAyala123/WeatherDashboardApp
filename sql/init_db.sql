@@ -14,7 +14,7 @@
 -- CREATE INDEX idx_songs_year ON songs(year);
 -- CREATE INDEX idx_songs_play_count ON songs(play_count);
 
-CREATE TABLE IF NOT EXISTS weather_data (
+DROP TABLE IF EXISTS weather_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     latitude REAL NOT NULL,       -- from user input / coord.lat
     longitude REAL NOT NULL,      -- from user input /coord.lon
@@ -26,13 +26,6 @@ CREATE TABLE IF NOT EXISTS weather_data (
     humidity INTEGER,             -- main.humidity
     weather_main TEXT,            -- weather[0].main
     weather_description TEXT     -- weather[0].description
-);
-
-CREATE TABLE IF NOT EXISTS favorites (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL,
-    city_name TEXT NOT NULL
 );
 
 --might want units parameter assume Imperial for F
