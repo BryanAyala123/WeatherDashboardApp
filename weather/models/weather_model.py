@@ -42,9 +42,10 @@ class WeatherModel:
 
         # Validate existence of location
         loc = Locations.get_location_by_id(loc_id)
-        city_code = loc.code  # assume code field matches API query
+        # Use city_name (or lat/lon) for API query
+        city_query = loc.city_name  # assume code field matches API query
         logger.info(f"Fetching current weather for location {loc_id} ({city_code})")
-        data = get_current_weather(city_code)
+        data = get_current_weather(city_query)
 
         self._weather_cache[loc_id] = data
         self._weather_ttl[loc_id] = now + self.ttl_seconds
@@ -59,9 +60,9 @@ class WeatherModel:
 
         # Validate existence of location
         loc = Locations.get_location_by_id(loc_id)
-        city_code = loc.code
+        city_query = loc.city_name
         logger.info(f"Fetching forecast for location {loc_id} (cnt={cnt})")
-        data = get_forecast(city_code, cnt=cnt)
+        data = get_forecast(city_query, cnt=cnt)
 
         self._forecast_cache[key] = data
         self._forecast_ttl[key] = now + self.ttl_seconds
