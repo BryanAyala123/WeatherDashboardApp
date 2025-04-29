@@ -24,9 +24,6 @@ class FavoriteslistModel:
 
         """
         self.favoriteslist: List[Tuple[str, float, float]] = [] 
-        self._location_cache: dict[int, Locations] = {}
-        self._ttl: dict[int, float] = {}
-        self.ttl_seconds = int(os.getenv("TTL", 60))   # Default TTL is 60 seconds
 
     ##################################################
     # Location Management Functions
@@ -37,26 +34,22 @@ class FavoriteslistModel:
         Adds a location to the favoriteslist by city_name, latitude, and longitude
 
         Args:
-            location_id (int): The ID of the location to add to the favoriteslist.
+            city_name (str): the city name of the location
+            latitude (float): the latitude of the location
+            longitude (float): the longitude of the location 
 
         Raises:
-            ValueError: If the location ID is invalid or already exists in the favoriteslist.
+            ValueError: If the combination of city_name, latitude, and longitude already exists in favoriteslist
         """
         logger.info(f"Received request to add location with name {city_name}, latitude {latitude}, and longitude {longitude} to the favoriteslist")
+        tuple_input = (city_name.strip(), latitude, longitude)
 
+        if tuple_input in self.favoriteslist: # go through the list to check the name lat and long
+            logger.error(f"Location with name {city_name} already exists in the favoriteslist")
+            raise ValueError(f"Location with name {city_name} already exists in the favoriteslist")
 
-        if city_name in self.favoriteslist: # go through the list to check the name lat and long
-            logger.error(f"Location with name {city_name}, latitude {latitude}, and longitude {longitude} already exists in the favoriteslist")
-            raise ValueError(f"Location with name {city_name}, latitude {latitude}, and longitude {longitude} already exists in the favoriteslist")
-
-        try:
-            location = self._get_location_from_cache_or_db(location_id)
-        except ValueError as e:
-            logger.error(f"Failed to add location: {e}")
-            raise
-
-        self.favoriteslist.append(Tuple[city_name, latitude, longitude])
-        logger.info(f"Successfully added to favoriteslist: {location.city_name}- ({location.latitude}, {location.longitude})")
+        self.favoriteslist.append(tuple_input)
+        logger.info(f"Successfully added to favoriteslist: {tuple_input}")
 
 
     def remove_location(self, city_name: str, latitude: float, longitude: float) -> None:
@@ -74,14 +67,13 @@ class FavoriteslistModel:
         logger.info(f"Received request to remove location with city_name {city_name}, latitude {latitude}, longitude {longitude}")
 
         self.check_if_empty()
-        location_id = self.validate_location_id(location_id)
+        tuple_input = (city_name.strip(), latitude, longitude)
+        if tuple_input not in self.favoriteslist:
+            logger.warning(f"Location with {tuple_input} not found in the favoriteslist")
+            raise ValueError(f"Location with name {tuple_input} not found in the favoriteslist")
 
-        if location_id not in self.favoriteslist:
-            logger.warning(f"location with ID {location_id} not found in the favoriteslist")
-            raise ValueError(f"location with ID {location_id} not found in the favoriteslist")
-
-        self.favoriteslist.remove(location_id)
-        logger.info(f"Successfully removed location with ID {location_id} from the favoriteslist")
+        self.favoriteslist.remove(tuple_input)
+        logger.info(f"Successfully removed location {tuple_input} from the favoriteslist")
 
     def clear_favoriteslist(self) -> None:
         """Clears all locations from the favoriteslist.
@@ -105,7 +97,7 @@ class FavoriteslistModel:
     # favoriteslist Retrieval Functions
     ##################################################
 
-    def get_all_locations(self) -> List[Locations]:
+    def get_all_locations(self) -> List[Tuple[str,float,float]]:
         """Returns a list of all location in the favorites using cached location data.
 
         Returns:
@@ -116,8 +108,7 @@ class FavoriteslistModel:
         """
         self.check_if_empty()
         logger.info("Retrieving all locations in favoriteslist")
-        return [self._get_location_from_cache_or_db(location_id) for location_id in self.favoriteslist]
-
+        return self.favoriteslist
 
     ##################################################
     # Utility Functions

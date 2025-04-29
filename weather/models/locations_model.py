@@ -1,6 +1,6 @@
 import logging
-
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError, desc
+from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from typing import List
 from datetime import datetime
 
@@ -47,7 +47,7 @@ class Locations(db.Model):
         if not isinstance(self.longitude, float) or not (-180 <= self.longitude <= 180):
             raise ValueError("Latitude must be within bounds of [-180,180]")
         if not self.time or not isinstance(self.time, datetime):
-            raise ValueError("Time must be in year month date ")
+            raise ValueError("Time must be a datetime object ")
         
     @classmethod
     def get_location_by_id(cls, location_id:int)-> "Locations":
@@ -76,6 +76,7 @@ class Locations(db.Model):
         except SQLAlchemyError as e:
             logger.error(f"Database error while retrieving location by ID {location_id}: {e}")
             raise
+
     @classmethod
     def get_location_by_compound_key(cls, city_name:str,latitude: float, longitude:float) -> "Locations":
         """
@@ -131,7 +132,7 @@ class Locations(db.Model):
             if not location:
                 logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
                 raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
-            logger.info(f"Successfully retrieved location: {city_name}- ({latitude},{longitude} at time: {location.time})")
+            logger.info(f"Successfully retrieved location: {city_name}- {latitude},{longitude} at time: {location.time}")
             return location 
         except SQLAlchemyError as e:
             logger.error(f"Database error while retrieving location by compound key"
@@ -141,7 +142,7 @@ class Locations(db.Model):
     @classmethod
     def get_weather_history(cls, city_name: str, latitude: float, longitude:float) -> List["Locations"]:
         """
-        Retrieves the previous weather in a location from the catalog by its compound key (city_name, latitude, longitude).
+        Retrieves the 3 most recent snapshots of a citys weather from the catalog by its compound key (city_name, latitude, longitude).
 
         Args:
             city_name (str): The city name of the location.
@@ -149,7 +150,7 @@ class Locations(db.Model):
             longitude (float): The longitude of the location.
 
         Returns:
-            Locations: The recent 3 location instance matching the provided compound key.
+            List[Locations]: The most recent 3 location instance matching the provided compound key.
 
         Raises:
             ValueError: If no matching location is found.
@@ -161,7 +162,7 @@ class Locations(db.Model):
             if not location:
                 logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
                 raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
-            logger.info(f"Successfully retrieved location: {location.city_name}- ({location.latitude},{location.longitude} at time: {location.time})")
+            logger.info(f"Successfully retrieved {len(location)} {city_name}- ({latitude},{longitude})")
             return location 
         except SQLAlchemyError as e:
             logger.error(f"Database error while retrieving location by compound key"
