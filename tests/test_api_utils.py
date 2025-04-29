@@ -21,7 +21,7 @@ def mock_requests_success(mocker):
     return resp
 
 
-# get_current_weather
+# ─── get_current_weather
 
 def test_get_current_weather_success(mock_requests_success):
     mock_requests_success.json.return_value = {"weather":[{"desc":"clear"}],"main":{"temp":25}}
