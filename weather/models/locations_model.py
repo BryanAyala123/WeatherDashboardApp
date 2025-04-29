@@ -1,16 +1,30 @@
+import logging
+
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from datetime import datetime
+
 from weather.db import db
-# from weather.utils.logger import configure_logger
-# from weather.utils.api_utils import get_random
+from weather.utils.logger import configure_logger
+
+logger = logging.getLogger(__name__)
+configure_logger(logger)
 
 class Locations(db.Model):
-    """Represents the weather data for a location 
+    """Represents a location in the catalog.
+
+    This model maps to the 'weather_data' table and stores metadata such as city_name,
+    latitude, longitude, time, temp, and more. It also tracks location count.
+
+    Used in a Flask-SQLAlchemy application for favoriteslist management,
+    user interaction, and data-driven song operations.
     """
+
     __tablename__ = 'weather_data'
 
     id = db.Column(db.Integer, primary_key=True)
     city_name= db.Column(db.String, nullable=False) 
-    latitude =db.Column(db.Double, nullable=False)
-    longitude = db.Column(db.Double, nullable=False)
+    latitude =db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     time = db.Column(db.DateTime, nullable = False)
     temp = db.Column(db.float)
     feels_like = db.Column(db.Float)
@@ -19,7 +33,78 @@ class Locations(db.Model):
     weather_main = db.Column(db.String)
     weather_description= db.Column(db.String)
 
-    #vvalidate_location_id
+    def validate(self) -> None:
+        """Validates the location instance before committing to the database.
 
-    # @classmethod
-    # def get_location_by_id
+        Raises:
+            ValueError: If any required fields are invalid.
+        """
+        if not self.city_name or not isinstance(self.city_name, str):
+            raise ValueError("City Name must be a non-empty string.")
+        if not isinstance(self.latitude, float) or (self.latitude <=90 and self.latitude >=-90):
+            raise ValueError("Latitude must be within bounds of [-90,90]")
+        if not isinstance(self.longitude, float) or (self.longitude <=180 and self.longitude >=-180):
+            raise ValueError("Latitude must be within bounds of [-180,180]")
+        if not self.time or not isinstance(self.time, datetime):
+            raise ValueError("Genre must be a non-empty string.")
+        
+    @classmethod
+    def get_location_by_id(cls, location_id:int)-> "Locations":
+        """
+        Retrieves a location from the catalog by its ID.
+
+        Args:
+            location_id (int): The ID of the location to retrieve.
+
+        Returns:
+            Locations: The location instance corresponding to the ID.
+
+        Raises:
+            ValueError: If no location with the given ID is found.
+            SQLAlchemyError: If a database error occurs.
+        """
+
+        logger.info(f"Attempting to retrieve location and weather with ID {location_id}")
+        try:
+            location=cls.query.get(location_id)
+            if not location:
+                logger.info(f"Location with ID {location_id} not found")
+                raise ValueError(f"Location with ID {location_id} not found")
+            logger.info(f"Successfully retrieved location: {location.city_name}- ({location.latitude},{location.longitude})")
+            return location 
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving location by ID {location_id}: {e}")
+            raise
+    @classmethod
+    def get_location_by_compound_key(cls, city_name:str,latitude: float, longitude:float) -> "Locations":
+        """
+        Retrieves a location from the catalog by its compound key (city_name, latitude, longitude).
+
+        Args:
+            city_name (str): The city name of the location.
+            latitude (float): The latitude of the location.
+            longitude (float): The longitude of the location.
+
+        Returns:
+            Locations: The location instance matching the provided compound key.
+
+        Raises:
+            ValueError: If no matching location is found.
+            SQLAlchemyError: If a database error occurs.
+        """
+
+        logger.info(f"Attempting to retrieve location and weather with city name '{city_name}, latitude {latitude}, and longitude {longitude}")
+        try:
+            location=cls.query.filter_by(city_name=city_name.strip(), latitude=latitude, longitude=longitude).first()
+            if not location:
+                logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+                raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+            logger.info(f"Successfully retrieved location: {location.city_name}- ({location.latitude},{location.longitude})")
+            return location 
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving location by compound key"
+                         f"cityname '{location.city_name}', latitude {location.latitude}, longitude {location.longitude}: {e}")
+            raise
+    
+    # @classmethod 
+    # def get_all_fav_location_by_id
