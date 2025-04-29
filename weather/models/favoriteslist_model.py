@@ -1,7 +1,7 @@
 import logging
 import os
 import time
-from typing import List
+from typing import List, Tuple
 
 from weather.utils.logger import configure_logger
 from weather.db import db
@@ -23,7 +23,7 @@ class FavoriteslistModel:
         which defaults to 60 seconds if not set.
 
         """
-        self.favoriteslist: List[int] = [] 
+        self.favoriteslist: List[Tuple[str, float, float]] = [] 
         self._location_cache: dict[int, Locations] = {}
         self._ttl: dict[int, float] = {}
         self.ttl_seconds = int(os.getenv("TTL", 60))   # Default TTL is 60 seconds
@@ -77,7 +77,7 @@ class FavoriteslistModel:
         logger.info(f"Received request to add location with ID {location_id} to the favoriteslist")
 
 
-        if location_id in self.favorites:
+        if location_id in self.favoriteslist:
             logger.error(f"Location with ID {location_id} already exists in the favoriteslist")
             raise ValueError(f"Location with ID {location_id} already exists in the favoriteslist")
 
@@ -105,7 +105,7 @@ class FavoriteslistModel:
         self.check_if_empty()
         location_id = self.validate_location_id(location_id)
 
-        if location_id not in self.favorites:
+        if location_id not in self.favoriteslist:
             logger.warning(f"location with ID {location_id} not found in the favoriteslist")
             raise ValueError(f"location with ID {location_id} not found in the favoriteslist")
 
@@ -176,7 +176,7 @@ class FavoriteslistModel:
             logger.error(f"Invalid location id: {location_id}")
             raise ValueError(f"Invalid location id: {location_id}")
 
-        if check_in_favoriteslist and location_id not in self.playlist:
+        if check_in_favoriteslist and location_id not in self.favoriteslist:
             logger.error(f"location with id {location_id} not found in favoriteslist")
             raise ValueError(f"location with id {location_id} not found in favoriteslist")
 

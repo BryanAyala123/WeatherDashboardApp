@@ -1,6 +1,7 @@
 import logging
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError, desc
+from typing import List
 from datetime import datetime
 
 from weather.db import db
@@ -26,7 +27,7 @@ class Locations(db.Model):
     latitude =db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     time = db.Column(db.DateTime, nullable = False)
-    temp = db.Column(db.float)
+    temp = db.Column(db.Float)
     feels_like = db.Column(db.Float)
     pressure = db.Column(db.Integer)
     humidity = db.Column(db.Integer)
@@ -41,17 +42,17 @@ class Locations(db.Model):
         """
         if not self.city_name or not isinstance(self.city_name, str):
             raise ValueError("City Name must be a non-empty string.")
-        if not isinstance(self.latitude, float) or (self.latitude <=90 and self.latitude >=-90):
+        if not isinstance(self.latitude, float) or not(-90 <= self.latitude <= 90):
             raise ValueError("Latitude must be within bounds of [-90,90]")
-        if not isinstance(self.longitude, float) or (self.longitude <=180 and self.longitude >=-180):
+        if not isinstance(self.longitude, float) or not (-180 <= self.longitude <= 180):
             raise ValueError("Latitude must be within bounds of [-180,180]")
         if not self.time or not isinstance(self.time, datetime):
-            raise ValueError("Genre must be a non-empty string.")
+            raise ValueError("Time must be in year month date ")
         
     @classmethod
     def get_location_by_id(cls, location_id:int)-> "Locations":
         """
-        Retrieves a location from the catalog by its ID.
+        Retrieves a snapshot of the weather in a location from the catalog by its ID.
 
         Args:
             location_id (int): The ID of the location to retrieve.
@@ -78,7 +79,7 @@ class Locations(db.Model):
     @classmethod
     def get_location_by_compound_key(cls, city_name:str,latitude: float, longitude:float) -> "Locations":
         """
-        Retrieves a location from the catalog by its compound key (city_name, latitude, longitude).
+        Retrieves a snapshot of the weather in a location from the catalog by its compound key (city_name, latitude, longitude).
 
         Args:
             city_name (str): The city name of the location.
@@ -99,12 +100,55 @@ class Locations(db.Model):
             if not location:
                 logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
                 raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
-            logger.info(f"Successfully retrieved location: {location.city_name}- ({location.latitude},{location.longitude})")
+            logger.info(f"Successfully retrieved location: {city_name}- ({latitude},{longitude})")
             return location 
         except SQLAlchemyError as e:
             logger.error(f"Database error while retrieving location by compound key"
-                         f"cityname '{location.city_name}', latitude {location.latitude}, longitude {location.longitude}: {e}")
+                         f"cityname '{city_name}', latitude {latitude}, longitude {longitude}: {e}")
             raise
+
+    @classmethod
+    def get_current_weather(cls, city_name:str, latitude: float, longitude:float) -> "Locations":
+        logger.info(f"Attempting to retrieve current location and weather with city name '{city_name}, latitude {latitude}, and longitude {longitude}")
+        try:
+            location=cls.query.filter_by(city_name=city_name.strip(), latitude=latitude, longitude=longitude).order_by(desc(cls.time)).first()
+            if not location:
+                logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+                raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+            logger.info(f"Successfully retrieved location: {city_name}- ({latitude},{longitude} at time: {time})")
+            return location 
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving location by compound key"
+                         f"cityname '{city_name}', latitude {latitude}, longitude {longitude}: {e}")
+            raise
+
+    @classmethod
+    def get_current_weather(cls, city_name:str, latitude: float, longitude:float) -> "Locations":
+        logger.info(f"Attempting to retrieve current location and weather with city name '{city_name}, latitude {latitude}, and longitude {longitude}")
+        try:
+            location=cls.query.filter_by(city_name=city_name.strip(), latitude=latitude, longitude=longitude).order_by(desc(cls.time)).first()
+            if not location:
+                logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+                raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+            logger.info(f"Successfully retrieved location: {city_name}- ({latitude},{longitude} at time: {time})")
+            return location 
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving location by compound key"
+                         f"cityname '{city_name}', latitude {latitude}, longitude {longitude}: {e}")
+            raise
+        
     
-    # @classmethod 
-    # def get_all_fav_location_by_id
+    @classmethod
+    def get_weather_history(cls, city_name: str, latitude: float, longitude:float) -> List["Locations"]:
+        logger.info(f"Attempting to retrieve previous weather with city name '{city_name}, latitude {latitude}, and longitude {longitude}")
+        try:
+            location=cls.query.filter_by(city_name=city_name.strip(), latitude=latitude, longitude=longitude).order_by(desc(cls.time)).limit(3).all()
+            if not location:
+                logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+                raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
+            logger.info(f"Successfully retrieved location: {location.city_name}- ({location.latitude},{location.longitude} at time: {location.time})")
+            return location 
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving location by compound key"
+                         f"cityname '{city_name}', latitude {latitude}, longitude {longitude}: {e}")
+            raise
