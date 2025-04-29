@@ -77,36 +77,6 @@ class Locations(db.Model):
             logger.error(f"Database error while retrieving location by ID {location_id}: {e}")
             raise
 
-    @classmethod
-    def get_location_by_compound_key(cls, city_name:str,latitude: float, longitude:float) -> "Locations":
-        """
-        Retrieves a snapshot of the weather in a location from the catalog by its compound key (city_name, latitude, longitude).
-
-        Args:
-            city_name (str): The city name of the location.
-            latitude (float): The latitude of the location.
-            longitude (float): The longitude of the location.
-
-        Returns:
-            Locations: The location instance matching the provided compound key.
-
-        Raises:
-            ValueError: If no matching location is found.
-            SQLAlchemyError: If a database error occurs.
-        """
-
-        logger.info(f"Attempting to retrieve location and weather with city name '{city_name}, latitude {latitude}, and longitude {longitude}")
-        try:
-            location=cls.query.filter_by(city_name=city_name.strip(), latitude=latitude, longitude=longitude).first()
-            if not location:
-                logger.info(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
-                raise ValueError(f"Location with city name '{city_name}, latitude {latitude}, and longitude {longitude} not found")
-            logger.info(f"Successfully retrieved location: {city_name}- ({latitude},{longitude})")
-            return location 
-        except SQLAlchemyError as e:
-            logger.error(f"Database error while retrieving location by compound key"
-                         f"cityname '{city_name}', latitude {latitude}, longitude {longitude}: {e}")
-            raise
 
     @classmethod
     def get_current_weather(cls, city_name:str, latitude: float, longitude:float) -> "Locations":
