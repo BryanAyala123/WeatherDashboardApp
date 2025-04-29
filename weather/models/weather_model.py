@@ -31,7 +31,7 @@ class WeatherModel:
         self.ttl_seconds = int(os.getenv("TTL", 60))
 
     ##################################################
-    # Internal Cache Management
+    # Internal Cache Functions
     ##################################################
 
     def _get_current_weather(self, loc_id: int) -> dict:
@@ -69,7 +69,7 @@ class WeatherModel:
         return data
 
     ##################################################
-    # Favorite Locations Management
+    # Update Functions
     ##################################################
 
     def add_favorite(self, loc_id: int) -> None:
@@ -102,7 +102,7 @@ class WeatherModel:
         logger.info("All favorites cleared")
 
     ##################################################
-    # Retrieval Functions
+    # Get Functions
     ##################################################
 
     def get_all_favorites(self) -> List[dict]:
