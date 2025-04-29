@@ -10,6 +10,8 @@ from weather.models.favoriteslist_model import FavoritesModel
 from weather.models.user_model import Users
 from weather.utils.logger import configure_logger
 
+load_dotenv()
+
 def create_app(config_class=ProductionConfig):
     app = Flask(__name__)
     configure_logger(app.logger)
@@ -252,14 +254,28 @@ def create_app(config_class=ProductionConfig):
         
     ##########################################################
     #
-    # Location
+    # Weather
     #
     ##########################################################
+    @app.route('/api/clear-favorites', methods=['POST'])
+    @login_required
+    def clear_favorites() -> Response:
+        """Route to clear list of favorites from the list
+        
+        Returns:
+            JSON response idicating the success of the operation
+            
+        Raises:
+            500 error if there is an issue clearing the favorites list
+        """
+        try:
+            app.logger.info("Clearing all favorites")
 
+            FavoritesModel.
 
     ############################################################
     #
     # Favorite Location List
     #
     ############################################################
-load_dotenv()
+    
