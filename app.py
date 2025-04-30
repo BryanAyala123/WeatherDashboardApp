@@ -254,24 +254,39 @@ def create_app(config_class=ProductionConfig):
         
     ##########################################################
     #
-    # Weather
+    # Location
     #
     ##########################################################
-    @app.route('/api/clear-favorites', methods=['POST'])
-    @login_required
-    def clear_favorites() -> Response:
-        """Route to clear list of favorites from the list
-        
+    @app.route("/api/reset-locations", methods=['DELETE'])
+    def reset_locations() -> Response:
+        """Recreate the locations table to delete locations.
+
         Returns:
-            JSON response idicating the success of the operation
-            
+            JSON response indicating the success of recreating the locations table.
+
         Raises:
-            500 error if there is an issue clearing the favorites list
+            500 error if there is an issue recreating the locations table.
         """
         try:
-            app.logger.info("Clearing all favorites")
+            app.logger.info("Received request to recreate Locations table")
+            with app.app_context():
+                Locations.__table__.drop(db.engine)
+                Locations.__table__.create(db.engine)
+            app.logger.info("Locations table recreated successfully")
+            return make_response(jsonify({
+                "status":"success",
+                "message": f"Locations table recreated successfully"
+            }),200)
+        
+        except Exception as e:
+            app.logger.error(f"Locations table recreation failed: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "An internal error occurred while deleting users",
+                "details": str(e)
+            }), 500)
 
-            FavoritesModel.
+    
 
     ############################################################
     #
