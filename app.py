@@ -295,3 +295,13 @@ def create_app(config_class=ProductionConfig):
     #
     ############################################################
     return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.logger.info("Starting Flask app...")
+    try:
+        app.run(debug=True, host="0.0.0.0", port=5001)
+    except Exception as e:
+        app.logger.error(f"Flask app encountered an error: {e}")
+    finally:
+        app.logger.info("Flask app has stopped.")
