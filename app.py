@@ -38,7 +38,8 @@ def create_app(config_class=ProductionConfig):
         }), 401)
 
 
-    FavoritesModel = FavoritesModel()
+   # FavoritesModel = FavoritesModel()
+    app.favorites_model = FavoriteslistModel()
 
     ####################################################
     #
@@ -293,4 +294,4 @@ def create_app(config_class=ProductionConfig):
     # Favorite Location List
     #
     ############################################################
-    
+    return app
