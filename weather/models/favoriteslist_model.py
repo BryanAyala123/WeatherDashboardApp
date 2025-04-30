@@ -82,7 +82,7 @@ class FavoriteslistModel:
         logger.info("Received request to clear the favoriteslist")
 
         if not self.favoriteslist:
-            logger.warning("Clearing an empty favoriteslist")
+            logger.warning("Clearing an empty favoriteslist.")
             return
 
         self.favoriteslist.clear()
