@@ -338,16 +338,117 @@ def create_app(config_class=ProductionConfig):
                 "message": "An internal error occurred while retrieving the location",
                 "details": str(e)
             }), 500)
+    
+    @app.route('/api/get-weather-from-location-history/<string:city_name>/<int:latitude>/<int:longitude>', methods=['GET'])
+    @login_required
+    def get_weather_from_location_history(city_name: str, latitude: int, longitude: int) -> Response:
+        """
+        Get weather from location history using city name and coordinates.
+
+        Args (via URL):
+            city_name (str): The name of the city.
+            latitude (int): The integer latitude of the location.
+            longitude (int): The integer longitude of the location.
+
+        Returns:
+            JSON response with weather info or error message.
+        """
+        try:
+            app.logger.info(f"Fetching weather for {city_name} at ({latitude}, {longitude})")
+
+            loc = Locations.get_weather_from_history(city_name, latitude, longitude)
+            if not loc:
+                return make_response(jsonify({
+                    "status": "error",
+                    "message": f"No weather history found for '{city_name}' at ({latitude}, {longitude})"
+                }), 404)
+
+            return make_response(jsonify({
+                "status": "success",
+                "weather": loc
+            }), 200)
+
+        except Exception as e:
+            app.logger.error(f"Error retrieving weather history: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "Internal server error",
+                "details": str(e)
+            }), 500)
+
+        
+    @app.route('/api/clear-favorites', methods=['POST'])
+    @login_required
+    def clear_favorite() -> Response:
+        """Route to clear the list of location from the favorites.
+
+        Returns:
+            JSON response indicating success of the operation.
+
+        Raises:
+            500 error if there is an issue clearing location.
+
+        """
+        try:
+            app.logger.info("Clearing all locations...")
+
+            Locations.clear_favoriteslist()
+
+            app.logger.info("Location cleared from favorites successfully.")
+            return make_response(jsonify({
+                "status": "success",
+                "message": "Location have been cleared from favorites."
+            }), 200)
+
+        except Exception as e:
+            app.logger.error(f"Failed to clear Location: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "An internal error occurred while clearing Location",
+                "details": str(e)
+            }), 500)
 
     ############################################################
     #
     # Favorite Location List
     #
     ############################################################
-    """@app.route('/api/add-location-to-favorite', methods=['POST'])
+    @app.route('/api/get-all-locations-from-favorite', methods=['GET'])
     @login_required
-    def add_location_to_favorite() -> Response:
-        Route to add a location to the fav by compound key (city_name, lat, long).
+    def get_all_locations_from_favorite() -> Response:
+        """Retrieve all locations in the favorite.
+
+        Returns:
+            JSON response containing the list of favorite.
+
+        Raises:
+            500 error if there is an issue retrieving the favorites.
+
+        """
+        try:
+            app.logger.info("Received request to retrieve all locations from the favorite.")
+
+            loc = Locations.get_all_locations()
+
+            app.logger.info(f"Successfully retrieved {len(loc)} locations from the favorites.")
+            return make_response(jsonify({
+                "status": "success",
+                "songs": loc
+            }), 200)
+
+        except Exception as e:
+            app.logger.error(f"Failed to retrieve locations from favorites: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "An internal error occurred while retrieving the favorites",
+                "details": str(e)
+            }), 500)
+
+
+    @app.route('/api/get-weather-from-favorite', methods=['POST'])
+    @login_required
+    def add_weather_to_favorite() -> Response:
+        '''Route to get weather from the the fav by compound key (city_name, lat, long).
 
         Expected JSON Input:
             - City Name (str): The city's name.
@@ -360,10 +461,10 @@ def create_app(config_class=ProductionConfig):
         Raises:
             400 error if required fields are missing or the location does not exist.
             500 error if there is an issue adding the location to the favorites.
-
+        '''
         
         try:
-            app.logger.info("Received request to add location to favorites")
+            app.logger.info("Received request to get weather from favorites")
 
             data = request.get_json()
             required_fields = ["city_name", "latitude", "longitude"]
@@ -389,31 +490,31 @@ def create_app(config_class=ProductionConfig):
                 }), 400)
 
             app.logger.info(f"Looking up location: {city} - {lat} ({long})")
-            loc = Locations.get_song_by_compound_key(city, lat, long)
+            loc = Locations.get_current_weather(city,lat,long)
 
-            if not song:
-                app.logger.warning(f"Song not found: {artist} - {title} ({year})")
+            if not loc:
+                app.logger.warning(f"Location not found: {city} - {lat} ({long})")
                 return make_response(jsonify({
                     "status": "error",
-                    "message": f"Song '{title}' by {artist} ({year}) not found in catalog"
+                    "message": f"Location '{city}' by {lat} ({long}) not found in catalog"
                 }), 400)
 
-            playlist_model.add_song_to_playlist(song)
-            app.logger.info(f"Successfully added song to playlist: {artist} - {title} ({year})")
+            Locations.add_location_to_favoriteslist(city,lat,long)
+            app.logger.info(f"Successfully added location to favorites: {city} - {lat} ({long})")
 
             return make_response(jsonify({
                 "status": "success",
-                "message": f"Song '{title}' by {artist} ({year}) added to playlist"
+                "message": f"Location '{city}' by {lat} ({long}) added to favorites"
             }), 201)
 
         except Exception as e:
-            app.logger.error(f"Failed to add song to playlist: {e}")
+            app.logger.error(f"Failed to add location to favorites: {e}")
             return make_response(jsonify({
                 "status": "error",
-                "message": "An internal error occurred while adding the song to the playlist",
+                "message": "An internal error occurred while adding the location to the favorites",
                 "details": str(e)
             }), 500)
-        """
+        
         
 
     
