@@ -19,8 +19,6 @@ class FavoriteslistModel:
         """Initializes the FavoritesModel with an empty list
 
         Favorites is a list of locations, that starts off empty.
-        The TTL (Time To Live) for location caching is set to a default value from the environment variable "TTL",
-        which defaults to 60 seconds if not set.
 
         """
         self.favoriteslist: List[Tuple[str, float, float]] = [] 
@@ -83,11 +81,9 @@ class FavoriteslistModel:
         """
         logger.info("Received request to clear the favoriteslist")
 
-        try:
-            if self.check_if_empty():
-                pass
-        except ValueError:
+        if not self.favoriteslist:
             logger.warning("Clearing an empty favoriteslist")
+            return
 
         self.favoriteslist.clear()
         logger.info("Successfully cleared the favoriteslist")
@@ -101,12 +97,12 @@ class FavoriteslistModel:
         """Returns a list of all location in the favorites using cached location data.
 
         Returns:
-            List[Location]: A list of all locations in the favorites list .
+            List[Tuple[str,float,float]]: A list of all locations name, latitude, and longitude in the favorites list .
+        """     
+        if not self.favoriteslist:
+            logger.warning("Retrieving locations from an empty favoriteslist.")
+            return []
 
-        Raises:
-            ValueError: If the favorites is empty.
-        """
-        self.check_if_empty()
         logger.info("Retrieving all locations in favoriteslist")
         return self.favoriteslist
 
