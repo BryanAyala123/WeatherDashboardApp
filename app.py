@@ -6,7 +6,7 @@ from config import ProductionConfig
 
 from weather.db import db
 from weather.models.locations_model import Locations
-from weather.models.favoriteslist_model import FavoritesModel
+from weather.models.favoriteslist_model import FavoriteslistModel
 from weather.models.user_model import Users
 from weather.utils.logger import configure_logger
 
