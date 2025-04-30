@@ -62,7 +62,7 @@ def test_get_location_by_id(location_london):
     assert loc.city_name=="London"
 
 
-def test_get_location_by_id_not_found():
+def test_get_location_by_id_not_found(app):
     """ Tests the get_location_by_id on an incorrect id """
     with pytest.raises(ValueError):
         Locations.get_location_by_id(2039102012010121)
@@ -107,7 +107,7 @@ def test_get_weather_history_returns_limit_3(session):
     assert result[0].time > result[1].time > result[2].time
 
 
-def test_get_weather_history_invalid():
+def test_get_weather_history_invalid(app):
     """Test error when method get_weather_history_returns does not get a valid location."""
     with pytest.raises(ValueError):
         Locations.get_weather_history("oeeaeoeeeae", 12, 34)
