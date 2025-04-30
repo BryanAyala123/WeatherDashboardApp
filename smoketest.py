@@ -14,6 +14,19 @@ def run_smoketest():
     assert delete_user_response.json()["status"] == "success"
     print("Reset users successful")
     
+    delete_location_response = requests.delete(f"{base_url}/reset-locations")
+    assert delete_location_response.status_code == 200
+    assert delete_location_response.json()["status"] == "success"
+    print("Reset Location successful")
+
+    create_user_response = requests.put(f"{base_url}/create-user", json={
+        "username": username,
+        "password": password
+    })
+    assert create_user_response.status_code == 201
+    assert create_user_response.json()["status"] == "success"
+    print("User creation successful")
+
     session = requests.Session()
     #log in test
     login_resp = session.post(f"{base_url}/login", json={

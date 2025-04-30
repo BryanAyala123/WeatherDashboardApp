@@ -296,13 +296,127 @@ def create_app(config_class=ProductionConfig):
                 "details": str(e)
             }), 500)
 
-    
+    @app.route('/api/get-locatio-by-id/<int:location_id>', methods=['GET'])
+    @login_required
+    def get_location_by_id(location_id: int) -> Response:
+        """Route to retrieve a location by its ID.
+
+        Path Parameter:
+            - location_id (int): The ID of the location.
+
+        Returns:
+            JSON response containing the location details.
+
+        Raises:
+            400 error if the location does not exist.
+            500 error if there is an issue retrieving the location.
+
+        """
+        try:
+            app.logger.info(f"Received request to retrieve location with ID {location_id}")
+
+            loc = Locations.get_location_by_id(location_id)
+            if not loc:
+                app.logger.warning(f"Location with ID {location_id} not found.")
+                return make_response(jsonify({
+                    "status": "error",
+                    "message": f"Location with ID {location_id} not found"
+                }), 400)
+
+            app.logger.info(f"Successfully retrieved location: {loc.city_name} it is {loc.feels_like} (ID {loc.id})")
+
+            return make_response(jsonify({
+                "status": "success",
+                "message": "location retrieved successfully",
+                "location": loc
+            }), 200)
+
+        except Exception as e:
+            app.logger.error(f"Failed to retrieve location by ID: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "An internal error occurred while retrieving the location",
+                "details": str(e)
+            }), 500)
 
     ############################################################
     #
     # Favorite Location List
     #
     ############################################################
+    """@app.route('/api/add-location-to-favorite', methods=['POST'])
+    @login_required
+    def add_location_to_favorite() -> Response:
+        Route to add a location to the fav by compound key (city_name, lat, long).
+
+        Expected JSON Input:
+            - City Name (str): The city's name.
+            - latitude (float): the latitude of the location
+            - longitude (float): the longitude of the location 
+
+        Returns:
+            JSON response indicating success of the addition.
+
+        Raises:
+            400 error if required fields are missing or the location does not exist.
+            500 error if there is an issue adding the location to the favorites.
+
+        
+        try:
+            app.logger.info("Received request to add location to favorites")
+
+            data = request.get_json()
+            required_fields = ["city_name", "latitude", "longitude"]
+            missing_fields = [field for field in required_fields if field not in data]
+
+            if missing_fields:
+                app.logger.warning(f"Missing required fields: {missing_fields}")
+                return make_response(jsonify({
+                    "status": "error",
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }), 400)
+
+            city = data["city_name"]
+            lat = data["latitude"]
+
+            try:
+                long = int(data["longitude"])
+            except ValueError:
+                app.logger.warning(f"Invalid long format: {data['longitude']}")
+                return make_response(jsonify({
+                    "status": "error",
+                    "message": "longitude must be a valid integer"
+                }), 400)
+
+            app.logger.info(f"Looking up location: {city} - {lat} ({long})")
+            loc = Locations.get_song_by_compound_key(city, lat, long)
+
+            if not song:
+                app.logger.warning(f"Song not found: {artist} - {title} ({year})")
+                return make_response(jsonify({
+                    "status": "error",
+                    "message": f"Song '{title}' by {artist} ({year}) not found in catalog"
+                }), 400)
+
+            playlist_model.add_song_to_playlist(song)
+            app.logger.info(f"Successfully added song to playlist: {artist} - {title} ({year})")
+
+            return make_response(jsonify({
+                "status": "success",
+                "message": f"Song '{title}' by {artist} ({year}) added to playlist"
+            }), 201)
+
+        except Exception as e:
+            app.logger.error(f"Failed to add song to playlist: {e}")
+            return make_response(jsonify({
+                "status": "error",
+                "message": "An internal error occurred while adding the song to the playlist",
+                "details": str(e)
+            }), 500)
+        """
+        
+
+    
     return app
 
 if __name__ == '__main__':
