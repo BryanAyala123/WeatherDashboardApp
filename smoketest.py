@@ -9,6 +9,11 @@ def run_smoketest():
     assert health_response.status_code == 200
     assert health_response.json()["status"] == "success"
 
+    delete_user_response = requests.delete(f"{base_url}/reset-users")
+    assert delete_user_response.status_code == 200
+    assert delete_user_response.json()["status"] == "success"
+    print("Reset users successful")
+    
     session = requests.Session()
     #log in test
     login_resp = session.post(f"{base_url}/login", json={

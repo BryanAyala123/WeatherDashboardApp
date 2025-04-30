@@ -13,6 +13,15 @@ from weather.utils.logger import configure_logger
 load_dotenv()
 
 def create_app(config_class=ProductionConfig):
+    """Create a Flask application with the specified configuration.
+
+    Args:
+        config_class (Config): The configuration class to use.
+
+    Returns:
+        Flask app: The configured Flask application.
+
+    """
     app = Flask(__name__)
     configure_logger(app.logger)
 

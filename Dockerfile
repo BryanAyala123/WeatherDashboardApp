@@ -19,6 +19,9 @@ RUN pip install -r requirements.txt
 # Install SQLite3
 RUN apt-get update && apt-get install -y sqlite3
 
+# Create the database directory
+RUN mkdir -p /app/db
+
 # Define a volume for persisting the database
 VOLUME ["/app/db"]
 
