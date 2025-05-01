@@ -42,6 +42,7 @@ command
 ■ Associated JSON response
 
 Unit tests:
+<pre>```
 ====================== test session starts ======================
 platform darwin -- Python 3.9.10, pytest-8.3.5, pluggy-1.5.0
 rootdir: /Users/aaronhuang/Desktop/WeatherDashboardApp
@@ -61,7 +62,7 @@ tests/test_locations_model.py::test_get_location_by_id_not_found
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 ================ 36 passed, 2 warnings in 1.61s =================
-
+```</pre>
 Smoketests:
 
 
