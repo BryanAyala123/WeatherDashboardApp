@@ -14,9 +14,10 @@ class ProductionConfig():
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "SQLALCHEMY_DATABASE_URI",
-        f"sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__), 'sql/weather.db'))}"
+        # This will create/use weather.db alongside app.py
+        f"sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__), 'weather.db'))}"
     )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+   
 
 class TestConfig():
     """Testing configuration."""
