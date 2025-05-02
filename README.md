@@ -64,7 +64,17 @@ tests/test_locations_model.py::test_get_location_by_id_not_found
 ================ 36 passed, 2 warnings in 1.61s =================
 ```</pre>
 Smoketests:
-
+<pre>
+```
+python smoketest.py
+Reset users successful
+Reset Location successful
+User creation successful
+Login successful
+Password change successful
+Login with new password successful
+```
+</pre>
 
 
 
