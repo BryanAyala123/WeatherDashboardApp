@@ -20,7 +20,7 @@ Route: /health
     - Code: 200
     - Content:{ 'status': 'success', 'message': 'Service is running' }
 - Example Request:  curl -X GET http://localhost:5000/api/health
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "Service is running"
@@ -41,7 +41,7 @@ Route: /create-user
 - Example Request: curl -X PUT http://localhost:5000/api/create-user \
      -H "Content-Type: application/json" \
      -d '{"username":"alice","password":"s3cret"}'
-- Example Response: HTTP/1.1 201 Created
+- Example Response:
 {
   "status": "success",
   "message": "User 'alice' created successfully"
@@ -61,7 +61,7 @@ Route: /login
 - Example Request: curl -X POST http://localhost:5000/api/login \
      -H "Content-Type: application/json" \
      -d '{"username":"alice","password":"s3cret"}'
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "User 'alice' logged in successfully"
@@ -79,7 +79,7 @@ Route: /logout
     - Content: {"status": "success", "message": "User logged out successfully"}
 - Example Request: curl -X POST http://localhost:5000/api/logout \
      --cookie "session=<your-session-cookie>"
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "User logged out successfully"
@@ -100,7 +100,7 @@ Route: /change-password
      -H "Content-Type: application/json" \
      --cookie "session=<your-session-cookie>" \
      -d '{"new_password":"n3wp@ss"}'
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "Password changed successfully"
@@ -117,7 +117,7 @@ Route: /reset-users
     - Code: 200 
     - Content: {"status": "success","message": f"Users table recreated successfully"}
 - Example Request: curl -X DELETE http://localhost:5000/api/reset-users
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "Users table recreated successfully"
@@ -134,7 +134,7 @@ Route: /reset-locations
     - Code: 200 
     - Content: {"status":"success", "message": f"Locations table recreated successfully"}
 - Example Request: curl -X DELETE http://localhost:5000/api/reset-locations
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "Locations table recreated successfully"
@@ -152,7 +152,7 @@ Route: /get-location-by-id/<int:location_id>
     - Content: {"status": "success", "message": "location retrieved successfully","location": loc}
 - Example Request: curl -X GET http://localhost:5000/api/get-location-by-id/5 \
      --cookie "session=<your-session-cookie>"
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "location retrieved successfully",
@@ -176,7 +176,7 @@ Route: /get-weather-from-location-history/<string:city_name>/<int:latitude>/<int
     - Content: {"status": "success", "weather": loc}
 - Example Request: curl -X GET http://localhost:5000/api/get-weather-from-location-history/Boston/42.36/-71.06 \
      --cookie "session=<your-session-cookie>"
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "weather": {
@@ -206,7 +206,7 @@ Route: /clear-favorites
     - Content: {"status": "success","message": "Location have been cleared from favorites."}
 - Example Request: curl -X POST http://localhost:5000/api/clear-favorites \
      --cookie "session=<your-session-cookie>"
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "message": "Location have been cleared from favorites."
@@ -224,7 +224,7 @@ Route: /get-all-locations-from-favorite
     - Content: {"status": "success","songs": loc}
 - Example Request: curl -X GET http://localhost:5000/api/get-all-locations-from-favorite \
      --cookie "session=<your-session-cookie>"
-- Example Response: HTTP/1.1 200 OK
+- Example Response: 
 {
   "status": "success",
   "songs": [
@@ -249,7 +249,7 @@ Route: /get-weather-from-favorite
      -H "Content-Type: application/json" \
      --cookie "session=<your-session-cookie>" \
      -d '{"city_name":"Boston","latitude":42.36,"longitude":-71.06}'
-- Example Response: HTTP/1.1 201 Created
+- Example Response: 
 {
   "status": "success",
   "message": "Location 'Boston' by 42.36 (-71.06) added to favorites"
