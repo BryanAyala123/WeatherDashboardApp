@@ -10,36 +10,159 @@ WeatherDashboardApp allows managing and displaying weather data from user favori
 - Get 5 day forecast for a Favorite location
 
 ### Route Documentation
-- Health Check | /api/health | GET
-- Create User | /api/create-user | PUT
-- Login | /api/login | POST
-- Logout | /api/logout | POST
-- Change Password | /api/change-password | POST
-- Reset Users | /api/reset-users | DELETE
-- Reset Locations | api/reset-locations | DELETE
-- Get Location By ID | /api/get-locatio-by-id/<int:location_id> | GET
-- Get Weather History | /api/get-weather-from-location-history/<string:city_name>/<int:latitude>/<int:longitude> | GET
-- Clear Favorites List | /api/clear-favorites | POST
-- Get all Favorite Location | get_all_locations_from_favorite | GET
-- Get Weather from Favorite location | /api/get-weather-from-favorite | POST
+Route: /health
+- Request Type: GET
+- Purpose:Verify the service is running
+- Request Body:
+  - no request body for this route
+- Response Format: JSON 
+  - Success Response Example:
+    - Code: 200
+    - Content:{ 'status': 'success', 'message': 'Service is running' }
+- Example Request:
+- Example Response:
+
+Route: /create-user
+- Request Type: PUT
+- Purpose: Register a new user account
+- Request Body:
+  - username (str): The desired username
+  - password (str): The desired password.
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 201 
+    - Content: {"status": "success",
+                "message": f"User '{username}' created successfully"}
+- Example Request:
+- Example Response:
+
+Route: /login
+- Request Type: POST
+- Purpose: Authenticate a user and log them in
+- Request Body:
+  - username (str): The username of the user.
+  - password (str): The password of the user.
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success",
+                    "message": f"User '{username}' logged in successfully"}
+- Example Request:
+- Example Response:
+
+Route: /logout
+- Request Type: POST
+- Purpose: Log out the current user
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success", "message": "User logged out successfully"}
+- Example Request:
+- Example Response:
+
+Route: /change-password
+- Request Type: POST
+- Purpose: Change the password for the current user
+- Request Body:
+  - new_password (str): The new password to set.
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {
+                "status": "success", "message": "Password changed successfully"}
+- Example Request:
+- Example Response:
+
+Route: /reset-users 
+- Request Type: DELETE
+- Purpose: Recreate the users table to delete all users
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success","message": f"Users table recreated successfully"}
+- Example Request:
+- Example Response:
+
+Route: /reset-locations 
+- Request Type: DELETE
+- Purpose: Recreate the locations table to delete locations
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {"status":"success", "message": f"Locations table recreated successfully"}
+- Example Request:
+- Example Response:
+
+Route: /get-location-by-id/<int:location_id>
+- Request Type: GET
+- Purpose: retrieve a location by its ID.
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success", "message": "location retrieved successfully","location": loc}
+- Example Request:
+- Example Response:
 
 
+Route: /get-weather-from-location-history/<string:city_name>/<int:latitude>/<int:longitude>
+- Request Type: GET
+- Purpose: Get weather from location history using city name and coordinates.
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+- Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success", "weather": loc}
+- Example Request:
+- Example Response:
 
-● A description of each route (example on ed discussion):
+Route: /clear-favorites
+- Request Type: POST
+- Purpose: Clear the list of location from the favorites.
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+- Success Response Example:
+    - Code: 200 
+    - Content: {"status": "success","message": "Location have been cleared from favorites."}
+- Example Request:
+- Example Response:
 
-○ Route Name and Path
-○ Request Type
-■ GET, POST, PUT, DELETE
-○ Purpose
-○ Request Format
-■ GET parameters
-■ POST / PUT / DELETE body
-○ Response Format
-■ JSON keys and value types
-○ Example
-■ Request in the form of JSON body or cURL
-command
-■ Associated JSON response
+Route: /get-all-locations-from-favorite
+- Request Type: GET
+- Purpose: Retrieve all locations in the favorite
+- Request Body:
+  - no request body for this route
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 200
+    - Content: {"status": "success","songs": loc}
+- Example Request:
+- Example Response:
+
+
+Route: /get-weather-from-favorite
+- Request Type: POST
+- Purpose: Get weather from the the favorite location by compound key (city_name, lat, long)
+- Request Body:
+   - City Name (str): The city's name.
+   - latitude (float): the latitude of the location
+   - longitude (float): the longitude of the location 
+- Response Format: JSON
+  - Success Response Example:
+    - Code: 201 
+    - Content: {"status": "success","message": f"Location '{city}' by {lat} ({long}) added to favorites"}
+- Example Request:
+- Example Response:
+
 
 Unit tests:
 <pre>```

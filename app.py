@@ -296,7 +296,7 @@ def create_app(config_class=ProductionConfig):
                 "details": str(e)
             }), 500)
 
-    @app.route('/api/get-locatio-by-id/<int:location_id>', methods=['GET'])
+    @app.route('/api/get-location-by-id/<int:location_id>', methods=['GET'])
     @login_required
     def get_location_by_id(location_id: int) -> Response:
         """Route to retrieve a location by its ID.
